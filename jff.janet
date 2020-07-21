@@ -48,28 +48,26 @@
     (var s @"")
     (var sd choices)
     (def lc (length choices))
+    (def cache (table))
 
     (defn match-n-sort [d s]
+      (var cnt 0)
       (def scored
         (reduce
           (fn [t [i _]]
             (let [sc (and (has-match s i) (score s i))]
               (if (and sc (> sc score-min))
-                (if (t sc)
-                  (update t sc array/concat i)
-                  (put t sc @[i]))
+                (do
+                  (++ cnt)
+                  (if (t sc)
+                    (update t sc array/concat i)
+                    (put t sc @[i])))
                 t)))
           (table/new (length d)) d))
-      (def res (array/new rows))
+      (def res (array/new cnt))
       (def ks (sort (keys scored)))
-      (with [f (file/open "log.log" :w)]
-        (with-dyns [:err f]
-          (tracev ks)))
-      (while (and (not (empty? ks)) (<= (length res) rows))
+      (while (not (empty? ks))
         (def k (array/pop ks))
-        (with [f (file/open "log.log" :a)]
-          (with-dyns [:err f]
-            (tracev k)))
         (def v (in scored k))
         (each i v (array/push res [i k])))
       res)
@@ -111,8 +109,10 @@
 
     (defn add-char [c]
       (reset-pos)
+      (def ck (freeze s))
+      (put cache ck (array/slice sd))
       (buffer/push-string s (utf8/encode [c]))
-      (set sd (match-n-sort sd s)))
+      (set sd (or (get cache (freeze s)) (match-n-sort sd s))))
 
     (defn complete []
       (reset-pos)
@@ -131,7 +131,7 @@
                        1))
         (cond
           (= (length sd) lc) (break)
-          (not (empty? s)) (set sd (match-n-sort choices s))
+          (not (empty? s)) (set sd (get cache (freeze s)))
           (set sd choices))))
 
     (while (and (nil? res) (tb/poll-event e))
