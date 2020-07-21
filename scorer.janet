@@ -15,20 +15,15 @@
 (defn- is-upper [s] (= s (string/ascii-upper s)))
 
 (defn- precompute-bonus [haystack]
-  (def m (length haystack))
-  (def match-bonus (array/new m))
-  (var last-ch "/")
-  (for i 0 m
-    (def ch (string/from-bytes (haystack i)))
-    (put match-bonus i
-         (cond
-           (= last-ch "/") score-match-slash
-           (or (= last-ch "-") (= last-ch " ") (= last-ch "_")) score-match-word
-           (= last-ch ".") score-match-dot
-           (and (is-lower last-ch) (is-upper ch)) score-match-capital
-           0))
-    (set last-ch ch))
-  match-bonus)
+  (var last-ch 47)
+  (seq [i :in haystack
+        :after (set last-ch i)]
+    (cond
+      (= last-ch 47) score-match-slash
+      (or (= last-ch 45) (= last-ch 32) (= last-ch 95)) score-match-word
+      (= last-ch 46) score-match-dot
+      (and (is-lower (string/from-bytes last-ch)) (is-upper (string/from-bytes i))) score-match-capital
+      0)))
 
 (defn compute [needle haystack D M]
   (def n (length needle))
@@ -44,13 +39,14 @@
     (var prev-score score-min)
     (var gap-score (if (= i (dec n)) score-gap-trailing score-gap-inner))
     (for j 0 m
-      (if (= (lower-needle i) (lower-haystack j))
+      (if (= (in lower-needle i) (in lower-haystack j))
         (do
           (var score score-min)
-          (cond
-            (zero? i) (set score (+ (* j score-gap-leading) (match-bonus j)))
-            (pos? j) (set score (max (+ (get-in M [(dec i) (dec j)]) (match-bonus j))
-                                     (+ (get-in D [(dec i) (dec j)]) score-match-consecutive))))
+          (set score
+               (cond
+                 (zero? i) (+ (* j score-gap-leading) (match-bonus j))
+                 (pos? j) (max (+ (get-in M [(dec i) (dec j)]) (match-bonus j))
+                               (+ (get-in D [(dec i) (dec j)]) score-match-consecutive))))
           (put-in D [i j] score)
           (put-in M [i j] (set prev-score (max score (+ prev-score gap-score)))))
         (do
@@ -78,10 +74,10 @@
     (set j (string/find (string/from-bytes (needle i)) haystack j))
     (when (nil? j) (break false))
     (set j (inc j)))
-  true)
+  j)
 
 
-#(defn score [needle haystack]
+#(defn positions [needle haystack]
 #(def n (length needle))
 #(def m (length haystack))
 #(def positions (array/new n))

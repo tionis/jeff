@@ -35,6 +35,18 @@
             :let [c (string/from-bytes i)]]
         ~(* (any (if-not ,c (* (constant -1) 1))) ,c))]))
 
+(defn match-n-sort [d s]
+  (->>
+    d
+    (reduce
+      (fn [a [i _]]
+        (let [sc (and (has-match s i) (score s i))]
+          (if (and sc (> sc score-min))
+            (array/push a [i sc])
+            a)))
+      (array/new (length d)))
+    (sort-by |(- (last $)))))
+
 (defn choose [prmt choices]
   (def choices (map |[$ 0] choices))
   (var res nil)
@@ -49,28 +61,6 @@
     (var sd choices)
     (def lc (length choices))
     (def cache (table))
-
-    (defn match-n-sort [d s]
-      (var cnt 0)
-      (def scored
-        (reduce
-          (fn [t [i _]]
-            (let [sc (and (has-match s i) (score s i))]
-              (if (and sc (> sc score-min))
-                (do
-                  (++ cnt)
-                  (if (t sc)
-                    (update t sc array/concat i)
-                    (put t sc @[i])))
-                t)))
-          (table/new (length d)) d))
-      (def res (array/new cnt))
-      (def ks (sort (keys scored)))
-      (while (not (empty? ks))
-        (def k (array/pop ks))
-        (def v (in scored k))
-        (each i v (array/push res [i k])))
-      res)
 
     (defn to-cells [message &opt col row style]
       (default col 0)
@@ -109,10 +99,9 @@
 
     (defn add-char [c]
       (reset-pos)
-      (def ck (freeze s))
-      (put cache ck (array/slice sd))
       (buffer/push-string s (utf8/encode [c]))
-      (set sd (or (get cache (freeze s)) (match-n-sort sd s))))
+      (set sd (or (get cache (freeze s)) (match-n-sort sd s)))
+      (put cache (freeze s) (array/slice sd)))
 
     (defn complete []
       (reset-pos)
@@ -131,7 +120,7 @@
                        1))
         (cond
           (= (length sd) lc) (break)
-          (not (empty? s)) (set sd (get cache (freeze s)))
+          (not (empty? s)) (set sd (or (get cache (freeze s)) (match-n-sort choices s)))
           (set sd choices))))
 
     (while (and (nil? res) (tb/poll-event e))
