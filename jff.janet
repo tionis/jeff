@@ -2,6 +2,9 @@
 (import utf8)
 (import argparse :prefix "")
 
+(import scorer :prefix "")
+
+
 (def argparse-params
   ["Janet Fuzzy Finder - get through some stdout almost omnisciently and friendly.
    "
@@ -47,20 +50,29 @@
     (def lc (length choices))
 
     (defn match-n-sort [d s]
-      (def cg (mg (string s)))
-      (def res
+      (def scored
         (reduce
-          (fn [a [i _]]
-            (def fs (string/find s i))
-            (cond
-              (or (zero? fs)
-                  (string/has-suffix? s i)) (array/push a [i 100])
-              fs (array/push a [i (- 50 fs)])
-              (if-let [p (and (< 1 (length s)) (:match cg i))] (array/push a [i (reduce + 0 p)]) a)))
-          (array/new (length d)) d))
-      (if (< (length res) lc)
-        (sort-by (fn [[i s]] (- (- s (/ (length i) 10)))) res)
-        res))
+          (fn [t [i _]]
+            (let [sc (and (has-match s i) (score s i))]
+              (if (and sc (> sc score-min))
+                (if (t sc)
+                  (update t sc array/concat i)
+                  (put t sc @[i]))
+                t)))
+          (table/new (length d)) d))
+      (def res (array/new rows))
+      (def ks (sort (keys scored)))
+      (with [f (file/open "log.log" :w)]
+        (with-dyns [:err f]
+          (tracev ks)))
+      (while (and (not (empty? ks)) (<= (length res) rows))
+        (def k (array/pop ks))
+        (with [f (file/open "log.log" :a)]
+          (with-dyns [:err f]
+            (tracev k)))
+        (def v (in scored k))
+        (each i v (array/push res [i k])))
+      res)
 
     (defn to-cells [message &opt col row style]
       (default col 0)
