@@ -40,15 +40,15 @@
     (var gap-score (if (= i (dec n)) score-gap-trailing score-gap-inner))
     (for j 0 m
       (if (= (in lower-needle i) (in lower-haystack j))
-        (do
-          (var score score-min)
-          (set score
-               (cond
-                 (zero? i) (+ (* j score-gap-leading) (match-bonus j))
-                 (pos? j) (max (+ (get-in M [(dec i) (dec j)]) (match-bonus j))
-                               (+ (get-in D [(dec i) (dec j)]) score-match-consecutive))))
+        (let [score
+              (cond
+                (zero? i) (+ (* j score-gap-leading) (match-bonus j))
+                (pos? j) (max (+ (get-in M [(dec i) (dec j)] score-min) (match-bonus j))
+                              (+ (get-in D [(dec i) (dec j)] score-min) score-match-consecutive))
+                score-min)]
           (put-in D [i j] score)
           (put-in M [i j] (set prev-score (max score (+ prev-score gap-score)))))
+
         (do
           (put-in D [i j] score-min)
           (put-in M [i j] (set prev-score (+ prev-score gap-score))))))))
