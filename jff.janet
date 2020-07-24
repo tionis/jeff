@@ -28,13 +28,6 @@
               :short "p"
               :help "File with code which must have three function preparer, matcher and transformer."}])
 
-(defn mg [b]
-  (peg/compile
-    ['*
-     ;(seq [i :in b
-            :let [c (string/from-bytes i)]]
-        ~(* (any (if-not ,c (* (constant -1) 1))) ,c))]))
-
 (defn match-n-sort [d s]
   (->>
     d
