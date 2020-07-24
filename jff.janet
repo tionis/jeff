@@ -2,7 +2,7 @@
 (import utf8)
 (import argparse :prefix "")
 
-(import scorer :prefix "")
+(import ./jff/scorer :prefix "")
 
 
 (def argparse-params
