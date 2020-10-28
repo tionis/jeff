@@ -28,18 +28,6 @@
               :short "p"
               :help "File with code which must have three function preparer, matcher and transformer."}])
 
-(defn match-n-sort [d s]
-  (->>
-    d
-    (reduce
-      (fn [a [i _]]
-        (let [sc (and (has-match s i) (score s i))]
-          (if (and sc (> sc score-min))
-            (array/push a [i sc])
-            a)))
-      (array/new (length d)))
-    (sort-by |(- (last $)))))
-
 (defn choose [prmt choices]
   (def choices (map |[$ 0] choices))
   (var res nil)
