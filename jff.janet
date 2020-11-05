@@ -49,7 +49,6 @@
 
       (def fg (case style
                 :inv tb/black
-                :soft tb/magenta
                 tb/white))
       (def bg (cond
                 (= :inv style) tb/green
@@ -66,9 +65,7 @@
       (for i 0 (min (length sd) rows)
         (def [term score] (get sd i))
         (to-cells term 0 (inc i)
-                  (cond
-                    (= pos i) :inv
-                    (neg? score) :soft)))
+                  (when (= pos i) :inv)))
       (tb/present))
 
     (show-ui)
