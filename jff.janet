@@ -64,8 +64,8 @@
                 0 0)
       (for i 0 (min (length sd) rows)
         (def [term score] (get sd i))
-        (to-cells term 0 (inc i)
-                  (when (= pos i) :inv)))
+        (to-cells (cond (> score 4) "█" (pos? score) "▅" "▁") 0 (inc i))
+        (to-cells term 2 (inc i) (when (= pos i) :inv)))
       (tb/present))
 
     (show-ui)
