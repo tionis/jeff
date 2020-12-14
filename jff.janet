@@ -43,29 +43,32 @@
     (def lc (length choices))
     (def cache (table))
 
-    (defn to-cells [message &opt col row style]
+    (defn to-cells [message &opt col row style positions]
       (default col 0)
       (default row 0)
-
-      (def fg (case style
-                :inv tb/black
-                tb/white))
-      (def bg (cond
-                (= :inv style) tb/green
-                tb/black))
+      (default positions [])
+      (def lfg (if (= style :inv) tb/magenta tb/white))
+      (def bg tb/black)
       (def msg (utf8/decode message))
+      (def rp (reverse positions))
+      (var np (array/pop rp))
+
       (for c 0 (min cols (length msg))
+        (def fg (if (= c np) (do (set np (array/pop rp)) tb/green) lfg))
         (tb/cell (+ col c) row (msg c) fg bg)))
 
     (defn show-ui []
+
       (tb/clear)
       (to-cells (string/format "%d/%d %s%s\u2588"
                                (length sd) lc prmt (string s))
                 0 0)
       (for i 0 (min (length sd) rows)
-        (def [term score] (get sd i))
+        (def [term score positions] (get sd i))
         (to-cells (cond (> score 4) "█" (pos? score) "▅" "▁") 0 (inc i))
-        (to-cells term 2 (inc i) (when (= pos i) :inv)))
+        (to-cells term 2 (inc i)
+                  (when (= pos i) :inv)
+                  positions))
       (tb/present))
 
     (show-ui)

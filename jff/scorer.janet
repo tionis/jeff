@@ -1,4 +1,3 @@
-# redone as struct
 (def score-min math/-inf)
 (def score-max math/inf)
 
@@ -47,8 +46,7 @@
                               (+ (get-in D [(dec i) (dec j)] score-min) score-match-consecutive))
                 score-min)]
           (put-in D [i j] score)
-          (put-in M [i j] (set prev-score (max score (+ prev-score gap-score)))))
-
+          (put-in M [i j] (set prev-score (max (or score math/-inf) (+ prev-score gap-score)))))
         (do
           (put-in D [i j] score-min)
           (put-in M [i j] (set prev-score (+ prev-score gap-score))))))))
@@ -76,6 +74,38 @@
     (set j (inc j)))
   j)
 
+(defn positions [needle haystack]
+  (def n (length needle))
+  (def m (length haystack))
+  (def positions (array/new n))
+  (when (or (zero? n) (zero? m)) (break positions))
+  (when (= n m)
+    (for i 0 (dec n)
+      (put positions i i))
+    (break positions))
+  (when (> m 1024) (break positions))
+  (def D (array/new n))
+  (def M (array/new n))
+  (compute needle haystack D M)
+  (var match_required false)
+
+  (var j (dec m))
+  (loop [i :down-to [(dec n) 0]]
+    (while (>= j 0)
+      (let [Dij (get-in D [i j])
+            Mij (get-in M [i j])]
+        (when (and (not (= Dij score-min))
+                   (or match_required (= Dij Mij)))
+          (set match_required
+               (and (pos? i) (pos? j)
+                    (= Mij (+ (get-in D [(dec i) (dec j)])
+                              score-match-consecutive))))
+          (put positions i j)
+          (-- j)
+          (break)))
+      (-- j)))
+
+  positions)
 
 (defn match-n-sort [d s]
   (->>
@@ -84,23 +114,7 @@
       (fn [a [i _]]
         (let [sc (and (has-match s i) (score s i))]
           (if (and sc (> sc score-min))
-            (array/push a [i sc])
+            (array/push a [i sc (positions s i)])
             a)))
       (array/new (length d)))
-    (sort-by |(- (last $)))))
-
-#(defn positions [needle haystack]
-#(def n (length needle))
-#(def m (length haystack))
-#(def positions (array/new n))
-#(when (or (zero? n) (zero? m)) (break positions))
-#(when (= n m)
-#(for i 0 (dec n)
-#(put positions i i))
-#(break positions))
-#(when (> m 1024) (break positions))
-#(def d (array/new n))
-#(def m (array/new n))
-#(compute needle haystack d m)
-#)
-
+    (sort-by |(- ($ 1)))))
