@@ -62,13 +62,13 @@
     (defn show-ui []
 
       (tb/clear)
-      (if input?
-        (to-cells (string/format "%s%s\u2588"
-                                 prmt (string s))
-                  0 0)
-        (to-cells (string/format "%d/%d %s%s\u2588"
-                                 (length sd) lc prmt (string s))
-                  0 0))
+      (to-cells
+        (if input?
+          (string/format "%s%s\u2588"
+                         prmt (string s))
+          (string/format "%d/%d %s%s\u2588"
+                         (length sd) lc prmt (string s)))
+        0 0)
       (for i 0 (min (length sd) rows)
         (def [term score positions] (get sd i))
         (to-cells (cond (> score 4) "█" (pos? score) "▅" "▁") 0 (inc i))
@@ -110,30 +110,27 @@
           (not (empty? s)) (set sd (or (get cache (freeze s)) (match-n-sort choices s)))
           (set sd choices))))
 
-    (def actions
-      (if input?
-        {tb/key-ctrl-n inc-pos tb/key-ctrl-j inc-pos
-         tb/key-arrow-down inc-pos
-         tb/key-ctrl-p dec-pos tb/key-ctrl-k dec-pos
-         tb/key-arrow-up dec-pos
-         tb/key-space |(add-char (chr " "))
-         tb/key-tab complete
-         tb/key-backspace2 erase-last
-         tb/key-ctrl-h erase-last
-         tb/key-esc quit tb/key-ctrl-c quit
-         tb/key-enter |(set res (or (get-in sd [pos 0]) s))}
-        {tb/key-space |(add-char (chr " "))
-         tb/key-backspace2 erase-last tb/key-ctrl-h erase-last
-         tb/key-esc quit tb/key-ctrl-c quit
-         tb/key-enter |(set res s)}))
+    (defn actions [key]
+      (def ba
+        @{tb/key-space |(add-char (chr " "))
+          tb/key-backspace2 erase-last tb/key-ctrl-h erase-last
+          tb/key-esc quit tb/key-ctrl-c quit
+          tb/key-enter |(set res s)})
+      ((if input?
+         (merge ba
+                {tb/key-ctrl-n inc-pos tb/key-ctrl-j inc-pos
+                 tb/key-arrow-down inc-pos
+                 tb/key-ctrl-p dec-pos tb/key-ctrl-k dec-pos
+                 tb/key-arrow-up dec-pos
+                 tb/key-tab complete
+                 tb/key-enter |(set res (or (get-in sd [pos 0]) s))})
+         ba) key))
 
     (while (and (nil? res) (tb/poll-event e))
-      (def c (tb/event-char e))
-      (def k (tb/event-key e))
-      (if (zero? c)
-        ((actions k))
-        (add-char c))
+      (def [c k] [(tb/event-char e) (tb/event-key e)])
+      (if (zero? c) ((actions k)) (add-char c))
       (show-ui))
+
     (tb/clear))
   res)
 

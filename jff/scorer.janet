@@ -108,6 +108,7 @@
   positions)
 
 (defn match-n-sort [d s]
+  (when (empty? d) (break d))
   (->>
     d
     (reduce
