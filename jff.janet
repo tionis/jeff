@@ -116,19 +116,21 @@
           tb/key-backspace2 erase-last tb/key-ctrl-h erase-last
           tb/key-esc quit tb/key-ctrl-c quit
           tb/key-enter |(set res s)})
-      ((if input?
-         (merge ba
-                {tb/key-ctrl-n inc-pos tb/key-ctrl-j inc-pos
-                 tb/key-arrow-down inc-pos
-                 tb/key-ctrl-p dec-pos tb/key-ctrl-k dec-pos
-                 tb/key-arrow-up dec-pos
-                 tb/key-tab complete
-                 tb/key-enter |(set res (or (get-in sd [pos 0]) s))})
-         ba) key))
+      (when-let [afn
+                 ((if (not input?)
+                    (merge ba
+                           {tb/key-ctrl-n inc-pos tb/key-ctrl-j inc-pos
+                            tb/key-arrow-down inc-pos
+                            tb/key-ctrl-p dec-pos tb/key-ctrl-k dec-pos
+                            tb/key-arrow-up dec-pos
+                            tb/key-tab complete
+                            tb/key-enter |(set res (or (get-in sd [pos 0]) s))})
+                    ba) key)]
+        (afn)))
 
     (while (and (nil? res) (tb/poll-event e))
       (def [c k] [(tb/event-char e) (tb/event-key e)])
-      (if (zero? c) ((actions k)) (add-char c))
+      (if (zero? c) (actions k) (add-char c))
       (show-ui))
 
     (tb/clear))
