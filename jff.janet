@@ -48,8 +48,9 @@
     (defn to-cells [message &opt col row style positions]
       (default col 0)
       (default row 0)
-      (def inv? (= style :inv))
       (default positions [])
+
+      (def inv? (= style :inv))
       (def lfg (if inv? tb/black tb/white))
       (def lbg (if inv? tb/white tb/black))
       (def msg (utf8/decode message))
@@ -58,8 +59,11 @@
 
       (for c 0 (min cols (length msg))
         (def p? (= c np))
-        (def bg (if p? (do (set np (array/pop rp)) (if inv? tb/yellow lbg)) lbg))
-        (def fg (if inv? lfg (if p? tb/yellow lfg)))
+        (def bg (if p? (do
+                         (unless (empty? rp) (set np (array/pop rp)))
+                         (if inv? tb/yellow lbg)) lbg))
+        (def fg (bor (if inv? lfg (if p? tb/yellow lfg))
+                     (if (= style :bold) tb/bold 0)))
         (tb/cell (+ col c) row (msg c) fg bg)))
 
     (defn show-ui []
@@ -71,7 +75,7 @@
                          prmt (string s))
           (string/format "%d/%d %s%s\u2588"
                          (length sd) lc prmt (string s)))
-        0 0)
+        0 0 :bold)
       (for i 0 (min (length sd) rows)
         (def [term score positions] (get sd i))
         (to-cells term 0 (inc i)

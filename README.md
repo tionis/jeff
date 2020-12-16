@@ -10,10 +10,8 @@ Even with its simplicity, it has replaced wofi/dmenu utility for me.
 
 ## Implementation
 
-I am using simple matching and scoring. Best score if choice starts or end
-with the user input. Second best score if the user input is anywhere in the
-string. Then fuzzy search with every intermittent char not in user input lower
-score by -1. All scores start as 0.
+jff uses algorithm used by the fzy fuzzy finder, rewritten in Janet programming
+language.
 
 Program is stable and responsive until around 1000 (depends on the machine)
 when the delay starts to be perceivable. I guess it is Janet GC kicking in, as I
