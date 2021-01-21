@@ -21,7 +21,8 @@
       (= last-ch 47) score-match-slash
       (or (= last-ch 45) (= last-ch 32) (= last-ch 95)) score-match-word
       (= last-ch 46) score-match-dot
-      (and (is-lower (string/from-bytes last-ch)) (is-upper (string/from-bytes i))) score-match-capital
+      (and (is-lower (string/from-bytes last-ch))
+           (is-upper (string/from-bytes i))) score-match-capital
       0)))
 
 (defn compute [needle haystack D M]
@@ -42,11 +43,14 @@
         (let [score
               (cond
                 (zero? i) (+ (* j score-gap-leading) (match-bonus j))
-                (pos? j) (max (+ (get-in M [(dec i) (dec j)] score-min) (match-bonus j))
-                              (+ (get-in D [(dec i) (dec j)] score-min) score-match-consecutive))
+                (pos? j) (max (+ (get-in M [(dec i) (dec j)] score-min)
+                                 (match-bonus j))
+                              (+ (get-in D [(dec i) (dec j)] score-min)
+                                 score-match-consecutive))
                 score-min)]
           (put-in D [i j] score)
-          (put-in M [i j] (set prev-score (max (or score math/-inf) (+ prev-score gap-score)))))
+          (put-in M [i j] (set prev-score (max (or score math/-inf)
+                                               (+ prev-score gap-score)))))
         (do
           (put-in D [i j] score-min)
           (put-in M [i j] (set prev-score (+ prev-score gap-score))))))))
@@ -55,9 +59,9 @@
 (defn score [needle haystack]
   (def n (length needle))
   (def m (length haystack))
-  (when (or (zero? n) (zero? m)) (break score-min))
-  (when (= n m) (break score-max))
-  (when (> m 1024) (break score-min))
+  (if (or (zero? n) (zero? m)) (break score-min))
+  (if (= n m) (break score-max))
+  (if (> m 1024) (break score-min))
   (def D (array/new n))
   (def M (array/new n))
   (compute needle haystack D M)
@@ -70,7 +74,7 @@
   (var j 0)
   (for i 0 l
     (set j (string/find (string/from-bytes (needle i)) haystack j))
-    (when (nil? j) (break false))
+    (if (nil? j) (break false))
     (set j (inc j)))
   j)
 
@@ -83,7 +87,7 @@
     (for i 0 (dec n)
       (put positions i i))
     (break positions))
-  (when (> m 1024) (break positions))
+  (if (> m 1024) (break positions))
   (def D (array/new n))
   (def M (array/new n))
   (compute needle haystack D M)
