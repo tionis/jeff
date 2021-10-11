@@ -8,8 +8,8 @@
   :dependencies ["spork"
                  "https://github.com/MorganPeterson/jermbox.git"
                  "https://github.com/crocket/janet-utf8.git"
-                 "https://github.com/janet-lang/argparse.git"])
+                 "https://github.com/janet-lang/spork.git"])
 
 (declare-executable :name "jff" :entry "jff.janet" :install true)
 
-(declare-source :source ["jff.janet" "jff/"])
+(declare-source :source ["jff.janet" "jff"])
