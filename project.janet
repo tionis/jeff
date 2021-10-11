@@ -6,7 +6,7 @@
   :url "https://git.sr.ht/~pepe/jff"
   :repo "git+https://git.sr.ht/~pepe/jff"
   :dependencies ["spork"
-                 "jermbox"
+                 "https://github.com/MorganPeterson/jermbox.git"
                  "https://github.com/crocket/janet-utf8.git"
                  "https://github.com/janet-lang/argparse.git"])
 
