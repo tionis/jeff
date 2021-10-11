@@ -1,4 +1,4 @@
-(import termbox :as tb)
+(import jermbox :as tb)
 (import utf8)
 (import argparse :prefix "")
 
@@ -38,7 +38,7 @@
 
     (def cols (tb/width))
     (def rows (tb/height))
-    (def e (tb/event))
+    (def e (tb/init-event))
     (var pos 0)
     (var s @"")
     (var sd choices)
@@ -64,7 +64,7 @@
                          (if inv? tb/yellow lbg)) lbg))
         (def fg (bor (if inv? lfg (if p? tb/yellow lfg))
                      (if (= style :bold) tb/bold 0)))
-        (tb/cell (+ col c) row (msg c) fg bg)))
+        (tb/change-cell (+ col c) row (msg c) fg bg)))
 
     (defn show-ui []
 
@@ -135,7 +135,7 @@
         (afn)))
 
     (while (and (nil? res) (tb/poll-event e))
-      (def [c k] [(tb/event-char e) (tb/event-key e)])
+      (def [c k] [(tb/event-character e) (tb/event-key e)])
       (if (zero? c) (actions k) (add-char c))
       (show-ui))
 

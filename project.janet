@@ -5,7 +5,8 @@
   :license "MIT"
   :url "https://git.sr.ht/~pepe/jff"
   :repo "git+https://git.sr.ht/~pepe/jff"
-  :dependencies ["https://github.com/sepisoad/jtbox"
+  :dependencies ["spork"
+                 "https://github.com/MorganPeterson/jermbox.git"
                  "https://github.com/crocket/janet-utf8.git"
                  "https://github.com/janet-lang/argparse.git"])
 
