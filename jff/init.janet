@@ -2,7 +2,7 @@
 (import utf8)
 (import spork/argparse :prefix "")
 
-(import ./jff/scorer :prefix "")
+(import /jff/scorer :prefix "")
 
 
 (def argparse-params
