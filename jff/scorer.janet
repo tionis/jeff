@@ -30,9 +30,7 @@
   (def m (length haystack))
   (def lower-needle (string/ascii-lower needle))
   (def lower-haystack (string/ascii-lower haystack))
-
   (def match-bonus (precompute-bonus haystack))
-
   (for i 0 n
     (put D i (array/new m))
     (put M i (array/new m))
@@ -68,21 +66,20 @@
   (get-in M [(dec n) (dec m)]))
 
 (defn has-match [needle haystack]
-  (def needle (string/ascii-lower needle))
-  (def haystack (string/ascii-lower haystack))
-  (def l (length needle))
+  (def n (string/ascii-lower needle))
+  (def h (string/ascii-lower haystack))
   (var j 0)
-  (for i 0 l
-    (set j (string/find (string/from-bytes (needle i)) haystack j))
-    (if (nil? j) (break false))
-    (set j (inc j)))
+  (for i 0 (length n)
+    (set j (string/find (string/from-bytes (n i)) h j))
+    (if-not j (break))
+    (++ j))
   j)
 
 (defn positions [needle haystack]
   (def n (length needle))
   (def m (length haystack))
   (def positions (array/new n))
-  (when (or (zero? n) (zero? m)) (break positions))
+  (if (or (zero? n) (zero? m)) (break positions))
   (when (= n m)
     (for i 0 (dec n)
       (put positions i i))
@@ -92,7 +89,6 @@
   (def M (array/new n))
   (compute needle haystack D M)
   (var match_required false)
-
   (var j (dec m))
   (loop [i :down-to [(dec n) 0]]
     (while (>= j 0)
@@ -108,18 +104,17 @@
           (-- j)
           (break)))
       (-- j)))
-
   positions)
 
+(defn match-and-score [d s]
+  (seq [[i _] :in d
+        :let [sc (and (has-match s i) (score s i))]
+        :when (and sc (> sc score-min))]
+    [i sc]))
+
 (defn match-n-sort [d s]
-  (when (empty? d) (break d))
-  (->>
-    d
-    (reduce
-      (fn [a [i _]]
-        (let [sc (and (has-match s i) (score s i))]
-          (if (and sc (> sc score-min))
-            (array/push a [i sc (positions s i)])
-            a)))
-      (array/new (length d)))
-    (sort-by |(- ($ 1)))))
+  (if (empty? d) (break d))
+  (def scored
+    (match-and-score d s))
+  (sort-by |(- ($ 1))
+           scored))

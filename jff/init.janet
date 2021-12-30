@@ -1,8 +1,8 @@
 (import jermbox :as tb)
 (import utf8)
-(import spork/argparse :prefix "")
+(use spork/argparse)
 
-(import /jff/scorer :prefix "")
+(use /jff/scorer)
 
 
 (def argparse-params
