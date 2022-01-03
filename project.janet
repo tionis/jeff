@@ -12,4 +12,4 @@
 
 (declare-executable :name "jff" :entry "jff.janet" :install true)
 
-(declare-source :source ["jff/"])
+(declare-source :source ["jff"])
