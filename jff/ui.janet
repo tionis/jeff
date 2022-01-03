@@ -1,6 +1,6 @@
 (import jermbox :as tb)
 (import utf8)
-(use jff/scorer)
+(use ./scorer)
 
 (defn choose [prmt choices]
   (def choices (map |[$ 0] choices))
