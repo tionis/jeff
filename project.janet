@@ -10,6 +10,6 @@
                  "https://github.com/crocket/janet-utf8.git"
                  "https://github.com/janet-lang/spork.git"])
 
-(declare-executable :name "jff" :entry "jff.janet" :install true)
-
 (declare-source :source ["jff"])
+
+(declare-executable :name "jff" :entry "jff.janet" :install true)
