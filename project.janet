@@ -14,4 +14,4 @@
   :prefix "jff"
   :source ["jff/ui.janet" "jff/scorer.janet" "jff/common.janet"])
 
-(declare-executable :name "jff" :entry "jff.janet" :install true)
+(declare-executable :name "jff" :entry "jff/cli.janet" :install true)
