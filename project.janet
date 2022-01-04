@@ -10,6 +10,10 @@
                  "https://github.com/crocket/janet-utf8.git"
                  "https://github.com/janet-lang/spork.git"])
 
+(declare-native
+  :name "fzy"
+  :source @["fzy_reduced.c"])
+
 (declare-source
   :prefix "jff"
   :source ["jff/ui.janet" "jff/scorer.janet" "jff/common.janet"])

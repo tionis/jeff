@@ -2,6 +2,7 @@
 #define MATCH_H MATCH_H
 
 #include <math.h>
+#include <stdlib.h>
 
 typedef double score_t;
 #define SCORE_MAX INFINITY
