@@ -1,4 +1,4 @@
-(import /build/fzy :prefix "" :export true)
+(import fzy :prefix "" :export true)
 
 (def score-min math/-inf)
 
