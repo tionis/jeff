@@ -62,7 +62,7 @@
     (defn reset-pos [] (set pos 0))
     (defn inc-pos [] (if (> (dec (length sd)) pos) (++ pos) (set pos 0)))
     (defn dec-pos [] (if (pos? pos) (-- pos) (set pos (dec (length sd)))))
-    (defn quit [] (tb/shutdown) (os/exit 1))
+    (defn quit [] (tb/shutdown) (os/exit 0))
 
     (defn add-char [c]
       (reset-pos)
