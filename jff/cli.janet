@@ -1,6 +1,6 @@
 (use spork/argparse)
 
-(use /jff/ui)
+(use ./ui)
 
 
 (def argparse-params

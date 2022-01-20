@@ -7,7 +7,7 @@
   :repo "git+https://git.sr.ht/~pepe/jff"
   :dependencies ["spork"
                  "https://github.com/MorganPeterson/jermbox.git"
-                 "https://github.com/crocket/janet-utf8.git"
+                 "https://github.com/andrewchambers/janet-utf8.git"
                  "https://git.sr.ht/~pepe/jfzy"])
 
 (declare-source

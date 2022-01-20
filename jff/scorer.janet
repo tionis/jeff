@@ -1,7 +1,5 @@
 (import fzy :prefix "" :export true)
 
-(def score-min math/-inf)
-
 (defn match-and-score [d s]
   (seq [[i _] :in d
         :let [sc (and (has-match s i) (score s i))]

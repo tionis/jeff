@@ -27,7 +27,7 @@
       (def inv? (= style :inv))
       (def lfg (if inv? tb/black tb/white))
       (def lbg (if inv? tb/white tb/black))
-      (def msg (utf8/decode message))
+      (def msg (utf8/to-codepoints message))
       (def rp (reverse positions))
       (var np (array/pop rp))
 
@@ -66,7 +66,7 @@
 
     (defn add-char [c]
       (reset-pos)
-      (buffer/push-string s (utf8/encode [c]))
+      (buffer/push-string s (utf8/from-codepoints [c]))
       (set sd (or (get cache (freeze s)) (match-n-sort sd s)))
       (put cache (freeze s) (array/slice sd)))
 
