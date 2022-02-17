@@ -41,7 +41,6 @@
         (tb/change-cell (+ col c) row (msg c) fg bg)))
 
     (defn show-ui []
-
       (tb/clear)
       (to-cells
         (if input?
