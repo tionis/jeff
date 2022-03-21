@@ -21,10 +21,10 @@
               :help "PEG grammar to match with the result. Default nil which means  no matching."}
    "code" {:kind :option
            :short "c"
-           :help "Janet function definition to transform result with. The selected choice or the PEG match if grammar provided. Default is print"}
+           :help "Janet function definition to transform result with. The selected choice or the PEG match if grammar provided. Default is print."}
    "program" {:kind :option
               :short "p"
-              :help "File with code which must have three function preparer, matcher and transformer."}])
+              :help "File with code which must have three values: prepare function, grammar peg and transform function."}])
 
 (defn main [_ &]
   (when-let [parsed (argparse ;argparse-params)]
