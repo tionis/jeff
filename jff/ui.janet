@@ -2,7 +2,9 @@
 (import utf8)
 (use ./scorer)
 
-(defn choose [prmt choices]
+# todo document
+(defn choose
+  [prmt choices]
   (def choices (map |[$ 0] choices))
   (var res nil)
   (def input? (empty? choices))
@@ -34,7 +36,7 @@
       (for c 0 (min cols (length msg))
         (def p? (= c np))
         (def bg (if p? (do
-                         (unless (empty? rp) (set np (array/pop rp)))
+                         (if (empty? rp) (set np (array/pop rp)))
                          (if inv? tb/yellow lbg)) lbg))
         (def fg (bor (if inv? lfg (if p? tb/yellow lfg))
                      (if (= style :bold) tb/bold 0)))
@@ -52,7 +54,7 @@
       (for i 0 (min (length sd) rows)
         (def [term score positions] (get sd i))
         (to-cells term 0 (inc i)
-                  (when (= pos i) :inv)
+                  (if (= pos i) :inv)
                   positions))
       (tb/present))
 
@@ -86,7 +88,8 @@
                        1))
         (cond
           (= (length sd) lc) (break)
-          (not (empty? s)) (set sd (or (get cache (freeze s)) (match-n-sort choices s)))
+          (not (empty? s)) (set sd (or (get cache (freeze s))
+                                       (match-n-sort choices s)))
           (set sd choices))))
 
     (defn actions [key]
@@ -95,16 +98,16 @@
           tb/key-backspace2 erase-last tb/key-ctrl-h erase-last
           tb/key-esc quit tb/key-ctrl-c quit
           tb/key-enter |(set res s)})
-      (when-let [afn
-                 ((if (not input?)
-                    (merge ba
-                           {tb/key-ctrl-n inc-pos tb/key-ctrl-j inc-pos
-                            tb/key-arrow-down inc-pos
-                            tb/key-ctrl-p dec-pos tb/key-ctrl-k dec-pos
-                            tb/key-arrow-up dec-pos
-                            tb/key-tab complete
-                            tb/key-enter |(set res (or (get-in sd [pos 0]) s))})
-                    ba) key)]
+      (if-let [afn
+               ((if (not input?)
+                  (merge ba
+                         {tb/key-ctrl-n inc-pos tb/key-ctrl-j inc-pos
+                          tb/key-arrow-down inc-pos
+                          tb/key-ctrl-p dec-pos tb/key-ctrl-k dec-pos
+                          tb/key-arrow-up dec-pos
+                          tb/key-tab complete
+                          tb/key-enter |(set res (or (get-in sd [pos 0]) s))})
+                  ba) key)]
         (afn)))
 
     (while (and (nil? res) (tb/poll-event e))
