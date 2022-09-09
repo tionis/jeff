@@ -11,9 +11,9 @@
   (def black [0 0 0])
   (def white [255 255 255])
 
-  (def nc (nc/init))
-  (defer (nc/stop nc)
-    (def np (nc/stdplane nc))
+  (def ncs (nc/init))
+  (defer (nc/stop ncs)
+    (def np (nc/stdplane ncs))
 
     (def cols (nc/dim-y np))
     (def rows (nc/dim-x np))
@@ -43,15 +43,19 @@
           (string/format "%d/%d %s%s\u2588"
                          (length sd) lc prmt (string s)))
         0 0 :bold)
-
-      (nc/render nc))
+      (for i 0 (min (length sd) rows)
+        (def [term score positions] (get sd i))
+        (to-cells term (inc i) 0
+                  (if (= pos i) :inv)
+                  positions))
+      (nc/render ncs))
 
     (show-ui)
 
     (defn reset-pos [] (set pos 0))
     (defn inc-pos [] (if (> (dec (length sd)) pos) (++ pos) (set pos 0)))
     (defn dec-pos [] (if (pos? pos) (-- pos) (set pos (dec (length sd)))))
-    (defn quit [] (nc/stop nc) (os/exit 0))
+    (defn quit [] (nc/stop ncs) (os/exit 0))
 
     (defn add-char [c]
       (reset-pos)
@@ -82,7 +86,6 @@
 
     (defn actions [key]
       (if (= (key :id) 1115500) (break))
-      (tracev key)
       (if (key :ctrl)
         (case (key :utf8)
           "h" (erase-last) "c" (quit)
@@ -97,8 +100,8 @@
             "\t" (complete)
             (add-char (key :utf8))))))
 
-    (while (nil? res)
-      (actions (tracev (nc/get-press nc)))
+    (while (= nil res)
+      (actions (nc/get-press ncs))
       (show-ui))
 
     (nc/erase np))
