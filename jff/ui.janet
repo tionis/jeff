@@ -1,4 +1,4 @@
-(import jermbox :as tb)
+(import notcurses :as nc)
 (import utf8)
 (use ./scorer)
 
@@ -8,13 +8,15 @@
   (def choices (map |[$ 0] choices))
   (var res nil)
   (def input? (empty? choices))
+  (def black [0 0 0])
+  (def white [255 255 255])
 
-  (defer (tb/shutdown)
-    (tb/init)
+  (def nc (nc/init))
+  (defer (nc/stop nc)
+    (def np (nc/stdplane nc))
 
-    (def cols (tb/width))
-    (def rows (tb/height))
-    (def e (tb/init-event))
+    (def cols (nc/dim-y np))
+    (def rows (nc/dim-x np))
     (var pos 0)
     (var s @"")
     (var sd choices)
@@ -27,23 +29,13 @@
       (default positions [])
 
       (def inv? (= style :inv))
-      (def lfg (if inv? tb/black tb/white))
-      (def lbg (if inv? tb/white tb/black))
-      (def msg (utf8/to-codepoints message))
-      (def rp (reverse positions))
-      (var np (array/pop rp))
+      (def lfg (if inv? black white))
+      (def lbg (if inv? white black))
 
-      (for c 0 (min cols (length msg))
-        (def p? (= c np))
-        (def bg (if p? (do
-                         (if (empty? rp) (set np (array/pop rp)))
-                         (if inv? tb/yellow lbg)) lbg))
-        (def fg (bor (if inv? lfg (if p? tb/yellow lfg))
-                     (if (= style :bold) tb/bold 0)))
-        (tb/change-cell (+ col c) row (msg c) fg bg)))
+      (nc/putstr-yx np col row message))
 
     (defn show-ui []
-      (tb/clear)
+      (nc/erase np)
       (to-cells
         (if input?
           (string/format "%s%s\u2588"
@@ -51,23 +43,19 @@
           (string/format "%d/%d %s%s\u2588"
                          (length sd) lc prmt (string s)))
         0 0 :bold)
-      (for i 0 (min (length sd) rows)
-        (def [term score positions] (get sd i))
-        (to-cells term 0 (inc i)
-                  (if (= pos i) :inv)
-                  positions))
-      (tb/present))
+
+      (nc/render nc))
 
     (show-ui)
 
     (defn reset-pos [] (set pos 0))
     (defn inc-pos [] (if (> (dec (length sd)) pos) (++ pos) (set pos 0)))
     (defn dec-pos [] (if (pos? pos) (-- pos) (set pos (dec (length sd)))))
-    (defn quit [] (tb/shutdown) (os/exit 0))
+    (defn quit [] (nc/stop nc) (os/exit 0))
 
     (defn add-char [c]
       (reset-pos)
-      (buffer/push-string s (utf8/from-codepoints [c]))
+      (buffer/push-string s c)
       (set sd (or (get cache (freeze s)) (match-n-sort sd s)))
       (put cache (freeze s) (array/slice sd)))
 
@@ -93,29 +81,27 @@
           (set sd choices))))
 
     (defn actions [key]
-      (def ba
-        @{tb/key-space |(add-char (chr " "))
-          tb/key-backspace2 erase-last tb/key-ctrl-h erase-last
-          tb/key-esc quit tb/key-ctrl-c quit
-          tb/key-enter |(set res s)})
-      (if-let [afn
-               ((if (not input?)
-                  (merge ba
-                         {tb/key-ctrl-n inc-pos tb/key-ctrl-j inc-pos
-                          tb/key-arrow-down inc-pos
-                          tb/key-ctrl-p dec-pos tb/key-ctrl-k dec-pos
-                          tb/key-arrow-up dec-pos
-                          tb/key-tab complete
-                          tb/key-enter |(set res (or (get-in sd [pos 0]) s))})
-                  ba) key)]
-        (afn)))
+      (if (= (key :id) 1115500) (break))
+      (tracev key)
+      (if (key :ctrl)
+        (case (key :utf8)
+          "h" (erase-last) "c" (quit)
+          "n" (inc-pos) "j" (inc-pos)
+          "p" (dec-pos) "k" (dec-pos))
+        (case (key :id)
+          1115004 (inc-pos)
+          1115002 (dec-pos)
+          1115121 (set res (or (get-in sd [pos 0]) s))
+          (case (key :utf8)
+            "\e" (quit)
+            "\t" (complete)
+            (add-char (key :utf8))))))
 
-    (while (and (nil? res) (tb/poll-event e))
-      (def [c k] [(tb/event-character e) (tb/event-key e)])
-      (if (zero? c) (actions k) (add-char c))
+    (while (nil? res)
+      (actions (tracev (nc/get-press nc)))
       (show-ui))
 
-    (tb/clear))
+    (nc/erase np))
   res)
 
 (defn input [prmt] (choose prmt []))
