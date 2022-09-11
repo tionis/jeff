@@ -56,10 +56,8 @@ function, grammar peg and transform function."}])
           (set transformer transform-fn)))
 
       (def file (if file (file/open file :r) stdin))
-      (def choices
-        (->> (seq [l :iterate (:read file :line)] (preparer (string/trim l)))
-             (filter |(not (empty? $)))))
-      (->> choices
+      (->> (seq [l :iterate (:read file :line)] (preparer (string/trim l)))
+           (filter |(not (empty? $)))
            (choose prmt)
            (matcher)
            (transformer)))))
