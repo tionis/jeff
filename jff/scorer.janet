@@ -8,4 +8,5 @@
 
 (defn match-n-sort [d s]
   (if (empty? d) (break d))
-  (sort-by |(- ($ 1)) (match-and-score d s)))
+  (sort-by |(- ($ 1))
+           (match-and-score d s)))
