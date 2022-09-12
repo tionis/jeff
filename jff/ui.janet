@@ -4,7 +4,7 @@
 
 # todo document
 (defn choose
-  [prmt choices]
+  [prmt choices &named keywords?]
   (def choices (map |[$ 0] choices))
   (var res nil)
   (def input? (empty? choices))
@@ -68,14 +68,14 @@
     (defn add-char [c]
       (reset-pos)
       (buffer/push-string s (utf8/from-codepoints [c]))
-      (set sd (or (get cache (freeze s)) (match-n-sort sd s)))
+      (set sd (or (get cache (freeze s)) (match-n-sort sd s keywords?)))
       (put cache (freeze s) (array/slice sd)))
 
     (defn complete []
       (reset-pos)
       (when (pos? (length sd))
         (set s (buffer (get-in sd [pos 0])))
-        (set sd (match-n-sort sd s))))
+        (set sd (match-n-sort sd s keywords?))))
 
     (defn erase-last []
       (reset-pos)
@@ -89,7 +89,7 @@
         (cond
           (= (length sd) lc) (break)
           (not (empty? s)) (set sd (or (get cache (freeze s))
-                                       (match-n-sort choices s)))
+                                       (match-n-sort choices s keywords?)))
           (set sd choices))))
 
     (defn actions [key]

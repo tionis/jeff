@@ -28,7 +28,11 @@ The selected choice or the PEG match if grammar provided. Default is print."}
    "program" {:kind :option
               :short "p"
               :help "File with code which must have three values: prepare 
-function, grammar peg and transform function."}])
+function, grammar peg and transform function."}
+   "keywords" {:kind :flag
+               :short "k"
+               :help "Instead of matching spaces literally, split the search 
+string at spaces and search for each part individually."}])
 
 (defn main [_ &]
   (if-let [parsed (argparse ;argparse-params)]
@@ -37,7 +41,8 @@ function, grammar peg and transform function."}])
            "prepare" prepare
            "grammar" grammar
            "code" code
-           "program" program} parsed]
+           "program" program
+           "keywords" keywords?} parsed]
 
       (var preparer identity)
       (var matcher identity)
@@ -54,10 +59,9 @@ function, grammar peg and transform function."}])
           (set matcher |(peg/match grammar-def $)))
         (if-let [transform-fn (get-in program ['transform :value])]
           (set transformer transform-fn)))
-
       (def file (if file (file/open file :r) stdin))
       (->> (seq [l :iterate (:read file :line)] (preparer (string/trim l)))
            (filter |(not (empty? $)))
-           (choose prmt)
+           (|(choose prmt $0 :keywords? keywords?))
            (matcher)
            (transformer)))))
