@@ -1,9 +1,10 @@
 (import fzy :prefix "" :export true)
+(import ./shlex)
 
 (defn match-and-score [d s &opt keywords?]
   (if keywords?
     (seq [[i _] :in d
-          :let [sc (sum (map |(score $0 i) (string/split " " (string/trim s))))]
+          :let [sc (sum (map |(score $0 i) (shlex/split (string/trim s))))]
           :when (and sc (> sc score-min))]
       [i sc])
     (seq [[i _] :in d

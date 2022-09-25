@@ -1,5 +1,4 @@
-# Janet Fuzzy Finder - get through some stdout almost omnisciently and friendly
-
+# Janet Extended Fuzzy Finder - get through some stdout almost omnisciently and friendly
 *Alpha Quality SW ahead*
 
 My exercise in command-line programming. Think of it as fzf, but without all the
@@ -10,7 +9,7 @@ Even with its simplicity, it has replaced wofi/dmenu utility for me.
 
 ## Implementation
 
-jff uses algorithm used by the fzy fuzzy finder, rewritten in Janet programming
+jeff uses the algorithm used by the fzy fuzzy finder, rewritten in Janet programming
 language.
 
 Program is stable and responsive until around 1000 (depends on the machine)
@@ -20,9 +19,9 @@ am not optimizing for memory consumption at all.
 ## Installation:
 
 You need the latest development version of Janet programming language installed.
-Then you can install jff with the jpm package manager:
+Then you can install jeff with the jpm package manager:
 
-`[sudo] jpm install https://github.com/pepe/jff`.
+`[sudo] jpm install https://github.com/pepe/jeff`.
 
 ## Usage:
 
@@ -39,7 +38,7 @@ Command line arguments:
  -r, --prompt VALUE=>                        Change the prompt. Default: '> '.
 ```
 
-`jff < $choides` will show the choices, and you can start fuzzy finding.
+`jeff < $choides` will show the choices, and you can start fuzzy finding.
 List of choices starts to narrow on every char. There are some special, yet
 standard key combos for navigation:
 
@@ -51,12 +50,12 @@ standard key combos for navigation:
 
 ### Common
 
-Under the ns jff is common module with some functionality, that can be used in
-in other programs for jff. Well, for now it is only work with prefix. You can
+Under the ns jeff is common module with some functionality, that can be used in
+in other programs for jeff. Well, for now it is only work with prefix. You can
 use them easily in your programs:
 
 ```
-(import jff/common)
+(import jeff/common)
 
 (def prefix (string ((os/environ) "HOME") "/Code/"))
 
@@ -66,13 +65,13 @@ use them easily in your programs:
 ```
 
 This script will strip the prefix from all choices and prepend it back to the
-result. If you save it in `/home/user/bin/jff/code.janet` file, you can use it with:
+result. If you save it in `/home/user/bin/jeff/code.janet` file, you can use it with:
 
 ```
 #!/bin/sh
 
 lr -1 -o A -A -t type=d  ~/Code/* ~/Code/*/* ~/Code/*/* ~/Code/*/*/* | \
-  jff -r 'sess:> ' -p ~/bin/jff/code.janet | \
+  jeff -r 'sess:> ' -p ~/bin/jeff/code.janet | \
   xe swaymsg exec -- alacritty --working-directory {}
 ```
 
@@ -83,13 +82,13 @@ to open the new terminal window on selected dir.
 Run the function on the result:
 
 ```
-lr -1 | janet jff.janet -c '|(print (string/ascii-upper $))'
+lr -1 | janet jeff.janet -c '|(print (string/ascii-upper $))'
 ```
 
 Match the result with the grammar and then runs the function:
 
 ```
-lr -1 | janet jff.janet -g '(<- (to "."))'
+lr -1 | janet jeff.janet -g '(<- (to "."))'
                         -c '|(print (string/ascii-upper (first $)))'
 ```
 

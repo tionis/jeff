@@ -1,18 +1,17 @@
 (declare-project
-  :name "jff"
-  :author "Josef Pospíšil <josef.pospisil@laststar.eu>"
-  :description "Janet Fuzzy Finder"
+  :name "jeff"
+  :author "Josef Pospíšil <josef.pospisil@laststar.eu>, tionis <janet@tionis.dev>"
+  :description "Janet Extended Fuzzy Finder"
   :license "MIT"
-  :url "https://git.sr.ht/~pepe/jff"
-  :repo "git+https://git.sr.ht/~pepe/jff"
+  :url "https://tasadar.net/tionis/jeff"
+  :repo "git+https://tasadar.net/tionis/jeff"
   :dependencies ["spork"
                  "https://github.com/MorganPeterson/jermbox.git"
                  "https://github.com/andrewchambers/janet-utf8.git"
                  "https://git.sr.ht/~pepe/jfzy"])
 
 (declare-source
-  :prefix "jff"
-  :source ["jff/ui.janet" "jff/scorer.janet" "jff/common.janet"])
+  :source ["jeff"])
 
-(declare-executable :name "jff" :entry "jff/cli.janet"
+(declare-executable :name "jeff" :entry "jeff/cli.janet"
                     :install true)

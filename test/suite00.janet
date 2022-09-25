@@ -1,5 +1,5 @@
 (use spork/test)
-(use /jff/scorer)
+(use ../jeff/scorer)
 
 (start-suite 0)
 
