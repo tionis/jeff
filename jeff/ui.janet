@@ -23,7 +23,7 @@
     (error "unsupported choices type")))
   (when preview-command (array/push args "--preview" preview-command))
   (when ansi-color (array/push args "--ansi"))
-  (when prompt (array/push args "--prompt" prompt))
+  (when prmpt (array/push args "--prompt" prmpt))
   (when multi (array/push args "--multi"))
   (def proc (os/spawn args :px {:out :pipe :in choices-stream}))
   (def out (get proc :out))
