@@ -48,9 +48,9 @@
       (to-cells
         (if input?
           (string/format "%s%s\u2588"
-                         prmt (string s))
+                         prmpt (string s))
           (string/format "%d/%d %s%s\u2588"
-                         (length sd) lc prmt (string s)))
+                         (length sd) lc prmpt (string s)))
         0 0 :bold)
       (for i 0 (min (length sd) rows)
         (def [term score positions] (get sd i))
@@ -119,4 +119,4 @@
     (tb/clear))
   res)
 
-(defn input [prmt] (choose prmt []))
+(defn input [prmpt] (choose prmpt []))
