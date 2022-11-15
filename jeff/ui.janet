@@ -1,10 +1,46 @@
 (import jermbox :as tb)
+(import spork/sh)
 (import utf8)
 (use ./scorer)
 
+(defn fzf/choose [choices &named prmpt preview-command ansi-color multi]
+  (def args @["fzf"])
+  (def choices-stream
+    (case (type choices)
+      :core/stream choices
+      :string (let [pipes (os/pipe)]
+                   (ev/write (pipes 1) choices)
+                   (ev/close (pipes 1))
+                   (pipes 0))
+      :tuple (let [pipes (os/pipe)]
+                   (ev/write (pipes 1) (string/join choices "\n"))
+                   (ev/close (pipes 1))
+                   (pipes 0))
+      :array (let [pipes (os/pipe)]
+                   (ev/write (pipes 1) (string/join choices "\n"))
+                   (ev/close (pipes 1))
+                   (pipes 0))
+    (error "unsupported choices type")))
+  (when preview-command (array/push args "--preview" preview-command))
+  (when ansi-color (array/push args "--ansi"))
+  (when prompt (array/push args "--prompt" prompt))
+  (when multi (array/push args "--multi"))
+  (def proc (os/spawn args :px {:out :pipe :in choices-stream}))
+  (def out (get proc :out))
+  (def buf @"")
+  (ev/gather
+    (:read out :all buf)
+    (:wait proc))
+  (if multi
+    (string/split "\n" (string/trimr buf))
+    (string/trimr buf)))
+
 # todo document
 (defn choose
-  [choices &named prmpt keywords?]
+  [choices &named prmpt keywords? use-fzf]
+  (if (and use-fzf # when use-fzf check if fzf is available, if not fall back to normal matching
+           (= (os/execute ["fzf" "--version"] :p {:out (sh/devnull) :err (sh/devnull)}) 0))
+    (fzf/choose choices :prmpt prmpt))
   (default prmpt "choose >")
   (def choices (map |[$ 0] choices))
   (var res nil)
