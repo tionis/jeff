@@ -4,7 +4,8 @@
 
 # todo document
 (defn choose
-  [prmt choices &named keywords?]
+  [choices &named prmpt keywords?]
+  (default prmpt "choose >")
   (def choices (map |[$ 0] choices))
   (var res nil)
   (def input? (empty? choices))
