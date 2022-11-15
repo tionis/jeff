@@ -8,7 +8,7 @@
   :dependencies ["spork"
                  "https://github.com/MorganPeterson/jermbox.git"
                  "https://github.com/andrewchambers/janet-utf8.git"
-                 "https://git.sr.ht/~pepe/jfzy"])
+                 "https://tasadar.net/tionis/jfzy"])
 
 (declare-source
   :source ["jeff"])
