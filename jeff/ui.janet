@@ -41,7 +41,7 @@
   (if (and use-fzf # when use-fzf check if fzf is available, if not fall back to normal matching
            (= (os/execute ["fzf" "--version"] :p {:out (sh/devnull) :err (sh/devnull)}) 0))
     (fzf/choose choices :prmpt prmpt))
-  (default prmpt "choose >")
+  (default prmpt "> ")
   (def choices (map |[$ 0] choices))
   (var res nil)
   (def input? (empty? choices))
