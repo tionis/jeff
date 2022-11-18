@@ -1,4 +1,6 @@
 # Janet Extended Fuzzy Finder - get through some stdout almost omnisciently and friendly
+> NOTE: this is a fork of https://git.sr.ht/~pepe/jff that adds a keywords based algorithm, changes the API and integrates support for shelling out to fzf
+
 *Alpha Quality SW ahead*
 
 My exercise in command-line programming. Think of it as fzf, but without all the
