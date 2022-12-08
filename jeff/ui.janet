@@ -25,15 +25,17 @@
   (when ansi-color (array/push args "--ansi"))
   (when prmpt (array/push args "--prompt" prmpt))
   (when multi (array/push args "--multi"))
-  (def proc (os/spawn args :px {:out :pipe :in choices-stream}))
-  (def out (get proc :out))
-  (def buf @"")
-  (ev/gather
-    (:read out :all buf)
-    (:wait proc))
-  (if multi
-    (string/split "\n" (string/trimr buf))
-    (string/trimr buf)))
+  (try
+    (do (def proc (os/spawn args :px {:out :pipe :in choices-stream}))
+        (def out (get proc :out))
+        (def buf @"")
+        (ev/gather
+          (:read out :all buf)
+          (:wait proc))
+        (if multi
+          (string/split "\n" (string/trimr buf))
+          (string/trimr buf)))
+    ([err] (os/exit 1))))
 
 # todo document
 (defn choose
