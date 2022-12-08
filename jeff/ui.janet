@@ -38,11 +38,8 @@
     ([err] (os/exit 1))))
 
 # todo document
-(defn choose
-  [choices &named prmpt keywords? use-fzf]
-  (if (and use-fzf # when use-fzf check if fzf is available, if not fall back to normal matching
-           (= (os/execute ["fzf" "--version"] :p {:out (sh/devnull) :err (sh/devnull)}) 0))
-    (fzf/choose choices :prmpt prmpt))
+(defn jeff/choose
+  [choices &named prmpt keywords?]
   (default prmpt "> ")
   (def choices (map |[$ 0] choices))
   (var res nil)
@@ -156,5 +153,12 @@
 
     (tb/clear))
   res)
+
+(defn choose
+  [choices &named prmpt keywords? use-fzf]
+  (if (and use-fzf # when use-fzf check if fzf is available, if not fall back to normal matching
+           (= (os/execute ["fzf" "--version"] :p {:out (sh/devnull) :err (sh/devnull)}) 0))
+    (fzf/choose choices :prmpt prmpt)
+    (jeff/choose choices :prmpt prmpt :keywords? keywords?)))
 
 (defn input [prmpt] (choose prmpt []))
