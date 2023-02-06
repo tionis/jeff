@@ -1,6 +1,6 @@
 (import jermbox :as tb)
 (import spork/sh)
-(import utf8)
+(import ./utf8)
 (use ./scorer)
 
 (defn fzf/choose [choices &named prmpt preview-command ansi-color multi]
