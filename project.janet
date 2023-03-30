@@ -7,10 +7,15 @@
   :repo "git+https://tasadar.net/tionis/jeff"
   :dependencies ["spork"
                  "https://github.com/MorganPeterson/jermbox.git"
-                 "https://tasadar.net/tionis/jfzy"])
+                 #"https://tasadar.net/tionis/jfzy"
+                 ])
 
 (declare-source
   :source ["jeff"])
+
+(declare-native
+  :name "fzy"
+  :source ["fzy.c"])
 
 (declare-executable :name "jeff" :entry "jeff/cli.janet"
                     :install true)
