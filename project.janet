@@ -6,8 +6,7 @@
   :url "https://tasadar.net/tionis/jeff"
   :repo "git+https://tasadar.net/tionis/jeff"
   :dependencies ["spork"
-                 "https://github.com/MorganPeterson/jermbox.git"
-                 "https://tasadar.net/tionis/jfzy"])
+                 "https://github.com/MorganPeterson/jermbox.git"])
 
 (declare-source
   :source ["jeff"])
