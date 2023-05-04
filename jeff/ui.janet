@@ -4,20 +4,20 @@
 (use ./scorer)
 
 (defn fzf/choose [choices &named prmpt preview-command ansi-color multi]
-  (def args @["fzf"])
+  (def args @["fzf" "--read0" "--print0"])
   (def choices-stream
     (case (type choices)
-      :core/stream choices
-      :string (let [pipes (os/pipe)]
-                   (ev/write (pipes 1) choices)
-                   (ev/close (pipes 1))
-                   (pipes 0))
+      #:core/stream choices
+      #:string (let [pipes (os/pipe)]
+      #             (ev/write (pipes 1) choices)
+      #             (ev/close (pipes 1))
+      #             (pipes 0))
       :tuple (let [pipes (os/pipe)]
-                   (ev/write (pipes 1) (string/join choices "\n"))
+                   (ev/write (pipes 1) (string/join choices "\0"))
                    (ev/close (pipes 1))
                    (pipes 0))
       :array (let [pipes (os/pipe)]
-                   (ev/write (pipes 1) (string/join choices "\n"))
+                   (ev/write (pipes 1) (string/join choices "\0"))
                    (ev/close (pipes 1))
                    (pipes 0))
     (error "unsupported choices type")))
@@ -33,7 +33,7 @@
           (:read out :all buf)
           (:wait proc))
         (if multi
-          (string/split "\n" (string/trimr buf))
+          (string/split "\0" (string/trimr buf))
           (string/trimr buf)))
     ([err] (os/exit 1))))
 
@@ -155,11 +155,11 @@
   res)
 
 (defn choose
-  [choices &named prmpt keywords? use-fzf]
+  [choices &named prmpt keywords? use-fzf multi]
   (default use-fzf (truthy? (os/getenv "TMUX"))) # TODO hotfix for #12
-  (if (and use-fzf # when use-fzf check if fzf is available, if not fall back to normal matching
+  (if (and (or use-fzf multi)# when use-fzf check if fzf is available, if not fall back to normal matching
            (= (os/execute ["fzf" "--version"] :p {:out (sh/devnull) :err (sh/devnull)}) 0))
-    (fzf/choose choices :prmpt prmpt)
+    (fzf/choose choices :prmpt prmpt :multi multi)
     (jeff/choose choices :prmpt prmpt :keywords? keywords?)))
 
 (defn input [prmpt] (choose prmpt []))
