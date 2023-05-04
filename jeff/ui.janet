@@ -33,7 +33,7 @@
           (:read out :all buf)
           (:wait proc))
         (if multi
-          (string/split "\0" (string/trimr buf))
+          (slice (string/split "\0" buf) 0 -2) # maybe it would be better to check if the last was empty or string the trailing \0 before
           (string/trimr buf)))
     ([err] (os/exit 1))))
 
