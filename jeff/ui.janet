@@ -3,6 +3,13 @@
 (import ./utf8)
 (use ./scorer)
 
+(defn- write-to-stream [str]
+  (def pipes (os/pipe))
+  (ev/spawn-thread
+    (ev/write (pipes 1) str)
+    (ev/close (pipes 1)))
+  (pipes 0))
+
 (defn fzf/choose [choices &named prmpt preview-command ansi-color multi]
   (def args @["fzf" "--read0" "--print0"])
   (def choices-stream
@@ -12,14 +19,9 @@
       #             (ev/write (pipes 1) choices)
       #             (ev/close (pipes 1))
       #             (pipes 0))
-      :tuple (let [pipes (os/pipe)]
-                   (ev/write (pipes 1) (string/join choices "\0"))
-                   (ev/close (pipes 1))
-                   (pipes 0))
-      :array (let [pipes (os/pipe)]
-                   (ev/write (pipes 1) (string/join choices "\0"))
-                   (ev/close (pipes 1))
-                   (pipes 0))
+      # TODO accept channels
+      :tuple (write-to-stream (string/join choices "\0"))
+      :array (write-to-stream (string/join choices "\0"))
     (error "unsupported choices type")))
   (when preview-command (array/push args "--preview" preview-command))
   (when ansi-color (array/push args "--ansi"))
