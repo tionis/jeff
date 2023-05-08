@@ -20,9 +20,10 @@
       #             (ev/close (pipes 1))
       #             (pipes 0))
       # TODO accept channels
-      :tuple (write-to-stream (string/join choices "\0"))
-      :array (write-to-stream (string/join choices "\0"))
+      :tuple (write-to-stream (string/join [;choices ""] "\0"))
+      :array (write-to-stream (string/join [;choices ""] "\0"))
     (error "unsupported choices type")))
+  #(pp (ev/read choices-stream :all))
   (when preview-command (array/push args "--preview" preview-command))
   (when ansi-color (array/push args "--ansi"))
   (when prmpt (array/push args "--prompt" prmpt))
@@ -35,8 +36,8 @@
           (:read out :all buf)
           (:wait proc))
         (if multi
-          (slice (string/split "\0" buf) 0 -2) # maybe it would be better to check if the last was empty or string the trailing \0 before
-          (string/trimr buf)))
+          (string/split "\0" (string/trim buf "\0"))
+          (string/trimr (string buf) "\0")))
     ([err] (os/exit 1))))
 
 # todo document
