@@ -8,10 +8,10 @@
   :dependencies ["spork"
                  "https://github.com/MorganPeterson/jermbox.git"])
 
-# (declare-binscript
-#   :main "bin/jeff"
-#   :hardcode-syspath false
-#   :is-janet true)
+(declare-binscript
+  :main "bin/jeff"
+  :hardcode-syspath false
+  :is-janet true)
 
 (def fzy
   (declare-native
@@ -21,8 +21,8 @@
 (declare-source
   :source ["jeff"])
 
-(declare-executable
-  :name "jeff"
-  :entry "jeff/cli.janet"
-  :deps [(fzy :static)]
-  :install true)
+# (declare-executable
+#   :name "jeff"
+#   :entry "jeff/cli.janet"
+#   :deps [(fzy :static)]
+#   :install true)
