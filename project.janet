@@ -8,16 +8,14 @@
   :dependencies ["spork"
                  "https://github.com/MorganPeterson/jermbox.git"])
 
-(def native-module
-  (declare-native
-   :name "fzy"
-   :source ["fzy.c"]))
+(declare-native
+ :name "fzy"
+ :source ["fzy.c"])
 
 (declare-source
   :source ["jeff"])
 
-(declare-executable
-  :name "jeff"
-  :entry "jeff/cli.janet"
-  :deps [(native-module :static)]
-  :install true)
+# (declare-executable
+#   :name "jeff"
+#   :entry "jeff/cli.janet"
+#   :install true)
