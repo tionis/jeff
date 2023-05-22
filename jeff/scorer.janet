@@ -1,4 +1,4 @@
-(import fzy :prefix "" :export true)
+(import @build-dir/fzy :prefix "" :export true)
 (import ./shlex)
 
 (defn match-and-score [d s &opt keywords?]
