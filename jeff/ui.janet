@@ -42,7 +42,7 @@
 
 # todo document
 (defn jeff/choose
-  [choices &named prmpt keywords?]
+  [choices &named prmpt keywords? multi]
   (default prmpt "> ")
   (def choices (map |[$ 0] choices))
   (var res nil)
@@ -155,7 +155,9 @@
       (show-ui))
 
     (tb/clear))
-  res)
+  (if multi
+    [res]
+    res))
 
 (defn choose
   [choices &named prmpt keywords? use-fzf multi]
@@ -163,6 +165,6 @@
   (if (and (or use-fzf multi)# when use-fzf check if fzf is available, if not fall back to normal matching
            (= (os/execute ["fzf" "--version"] :p {:out (sh/devnull) :err (sh/devnull)}) 0))
     (fzf/choose choices :prmpt prmpt :multi multi)
-    (jeff/choose choices :prmpt prmpt :keywords? keywords?)))
+    (jeff/choose choices :prmpt prmpt :keywords? keywords? :multi multi)))
 
 (defn input [prmpt] (choose prmpt []))
