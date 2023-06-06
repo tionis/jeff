@@ -161,7 +161,6 @@
 
 (defn choose
   [choices &named prmpt keywords? use-fzf multi]
-  (default use-fzf (truthy? (os/getenv "TMUX"))) # TODO hotfix for #12
   (if (and (or use-fzf multi)# when use-fzf check if fzf is available, if not fall back to normal matching
            (= (os/execute ["fzf" "--version"] :p {:out (sh/devnull) :err (sh/devnull)}) 0))
     (fzf/choose choices :prmpt prmpt :multi multi)
