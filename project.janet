@@ -13,16 +13,16 @@
 #   :hardcode-syspath false
 #   :is-janet true)
 
-(def fzy
-  (declare-native
-    :name "fzy"
-    :source ["fzy.c"]))
-
 (declare-source
   :source ["jeff"])
+
+(def fuzzy
+  (declare-native
+    :name "fuzzy"
+    :source ["./cjanet/fuzzy.janet"]))
 
 (declare-executable
   :name "jeff"
   :entry "jeff/cli.janet"
-  :deps [(fzy :static)]
+  :deps [(fuzzy :static)]
   :install true)
